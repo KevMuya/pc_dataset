@@ -1,0 +1,224 @@
+{
+  "validation_rules": {
+    "required_fields": [
+      "Continent",
+      "Country or State",
+      "Shop Name",
+      "PC Make",
+      "PC Model",
+      "Customer Name",
+      "Customer Surname",
+      "Sale Date"
+    ],
+    "field_rules": {
+      "Continent": {
+        "type": "string",
+        "allowed_values": [
+          "North America",
+          "Africa",
+          "Europe",
+          "Asia",
+          "South America",
+          "Oceania"
+        ],
+        "error_message": "Continent must be a valid continent name"
+      },
+      "Country or State": {
+        "type": "string",
+        "min_length": 2,
+        "max_length": 50,
+        "error_message": "Country/State must be 2-50 characters"
+      },
+      "Shop Age": {
+        "type": "integer",
+        "min_value": 1,
+        "max_value": 100,
+        "error_message": "Shop Age must be between 1 and 100"
+      },
+      "PC Make": {
+        "type": "string",
+        "allowed_values": [
+          "Asus",
+          "HP",
+          "Apple",
+          "Lenovo",
+          "Dell",
+          "Microsoft",
+          "Samsung",
+          "Toshiba",
+          "MSI",
+          "Acer"
+        ],
+        "error_message": "PC Make must be a recognized manufacturer"
+      },
+      "Storage Type": {
+        "type": "string",
+        "allowed_values": [
+          "HDD",
+          "SSD",
+          "NVMe"
+        ],
+        "error_message": "Storage Type must be HDD, SSD, or NVMe"
+      },
+      "Customer Contact Number": {
+        "type": "string",
+        "pattern": "^\\d{10,15}$",
+        "description": "Phone number as digits only (10-15 characters)",
+        "error_message": "Phone number must contain 10-15 digits only"
+      },
+      "Customer Email Address": {
+        "type": "string",
+        "pattern": "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$",
+        "error_message": "Email address must be in valid format (user@domain.com)"
+      },
+      "Sales Type": {
+        "type": "string",
+        "allowed_values": [
+          "New Sales",
+          "Repairs",
+          "Returns",
+          "Second-hand Sales"
+        ],
+        "error_message": "Sales Type must be one of: New Sales, Repairs, Returns, Second-hand Sales"
+      },
+      "Payment Method": {
+        "type": "string",
+        "allowed_values": [
+          "Cash",
+          "Finance",
+          "Bank Transfer",
+          "Credit Card",
+          "Debit Card"
+        ],
+        "error_message": "Payment Method must be a recognized payment type"
+      },
+      "Priority Level": {
+        "type": "string",
+        "allowed_values": [
+          "Low",
+          "Medium",
+          "High"
+        ],
+        "error_message": "Priority Level must be Low, Medium, or High"
+      },
+      "Channel": {
+        "type": "string",
+        "allowed_values": [
+          "Online",
+          "Offline"
+        ],
+        "error_message": "Channel must be Online or Offline"
+      },
+      "Sale Date": {
+        "type": "date",
+        "format": "YYYY-MM-DD",
+        "error_message": "Sale Date must be in format YYYY-MM-DD"
+      },
+      "Warranty Return Date": {
+        "type": "date",
+        "format": "YYYY-MM-DD",
+        "nullable": true,
+        "error_message": "Warranty Return Date must be in format YYYY-MM-DD or empty/NULL"
+      },
+      "RAM Size": {
+        "type": "string",
+        "pattern": "^\\d+(GB|TB)$",
+        "allowed_values": [
+          "2GB",
+          "4GB",
+          "8GB",
+          "16GB",
+          "32GB",
+          "64GB",
+          "128GB",
+          "256GB",
+          "512GB",
+          "1TB"
+        ],
+        "error_message": "RAM Size must be in format like 4GB, 8GB, 16GB, or 1TB"
+      },
+      "Storage Capacity": {
+        "type": "string",
+        "pattern": "^\\d+(GB|TB)$",
+        "allowed_values": [
+          "128GB",
+          "256GB",
+          "512GB",
+          "1TB",
+          "2TB",
+          "4TB"
+        ],
+        "error_message": "Storage Capacity must be in format like 256GB, 512GB, 1TB"
+      },
+      "numeric_fields": {
+        "type": "integer",
+        "min_value": 0,
+        "fields": [
+          "Sales Value",
+          "Cost Value",
+          "Retail Price",
+          "Warranty Cost",
+          "Miscellaneous Cost 1",
+          "Miscellaneous Cost 2",
+          "Miscellaneous Cost 3",
+          "Miscellaneous Value"
+        ],
+        "error_message": "Numeric field must be a positive integer (≥ 0)"
+      }
+    },
+    "cross_field_rules": [
+      {
+        "name": "Retail Price Logic",
+        "rule": "Retail Price should be >= Cost Value",
+        "fields": [
+          "Cost Value",
+          "Retail Price"
+        ]
+      },
+      {
+        "name": "Warranty Date Logic",
+        "rule": "Warranty Return Date should be >= Sale Date (if provided)",
+        "fields": [
+          "Sale Date",
+          "Warranty Return Date"
+        ]
+      },
+      {
+        "name": "Sales Value Range",
+        "rule": "Sales Value should be between Cost Value and Retail Price",
+        "fields": [
+          "Cost Value",
+          "Sales Value",
+          "Retail Price"
+        ]
+      }
+    ],
+    "data_cleaning_transformations": [
+      {
+        "field": "Customer Contact Number",
+        "action": "Remove all non-numeric characters",
+        "example": "(430) 332-4476 → 4303324476"
+      },
+      {
+        "field": "Warranty Return Date",
+        "action": "Convert 'N/A' to empty string or NULL",
+        "example": "N/A → (empty)"
+      },
+      {
+        "field": "All Text Fields",
+        "action": "Trim whitespace and standardize case",
+        "example": "  apple  → Apple"
+      },
+      {
+        "field": "PC Make",
+        "action": "Standardize manufacturer names",
+        "example": "ASUS → Asus, HP/Hewlett Packard → HP"
+      },
+      {
+        "field": "Sales Type",
+        "action": "Ensure consistent capitalization",
+        "example": "second-hand sales → Second-hand Sales"
+      }
+    ]
+  }
+}
